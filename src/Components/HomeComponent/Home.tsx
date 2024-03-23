@@ -4,6 +4,10 @@ import TextField from '@material-ui/core/TextField';
 import { FormControl,FormHelperText } from '@material-ui/core';
 import InputAdornment from '@material-ui/core/InputAdornment';
 import IconButton from '@material-ui/core/IconButton';
+//import { withRouter, RouteComponentProps } from 'react-router-dom'; // Import withRouter
+//import { NavigateProps } from 'react-router-dom';
+//import NavigatorService from './services/navigator';
+import { Navigate } from 'react-router-dom';
 import VisibilityOff from '@material-ui/icons/VisibilityOff';
 import Visibility from '@material-ui/icons/Visibility';
 import Button from '@material-ui/core/Button';
@@ -38,7 +42,7 @@ const styles = (theme: Theme) => createStyles({
 });
 
 // Define props as a TypeScript interface extending WithStyles
-interface HomeProps extends WithStyles<typeof styles> { }
+interface HomeProps extends WithStyles<typeof styles> {}
 interface User {
   uid:string;
   name: string;
@@ -51,6 +55,7 @@ interface User {
   errors: {
     [key: string]: string;
   };
+  navigateToOtherRoute: boolean;
 }
 interface State {
   uid : string;
@@ -64,6 +69,7 @@ interface State {
   errors: {
     [key: string]: string;
   };
+  navigateToOtherRoute: boolean;
 }
 
 // Create class-based component
@@ -81,7 +87,9 @@ class Home extends Component<HomeProps,User,State> {
       showPassword: false,
       uList: [], // Initialize rows in the state
       errors: {},
-    }
+      navigateToOtherRoute: false
+    };
+    this.handleView = this.handleView.bind(this);
   }
 
   handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -159,7 +167,15 @@ class Home extends Component<HomeProps,User,State> {
   };
   
 
-
+  handleView(params: any) {
+    //console.log(params);
+    //const { navigate } = this.props; // Access navigate from props
+    //navigate('/another-component', { state: { myParameter: 'parameterValue' } }); // Navigate to another component with parameters
+    //this.state.redirect && <Navigate to='/some_route' replace={true}/>
+    //console.log(params);
+    this.setState({ navigateToOtherRoute: true, uid: params.row.UID });
+    
+  }
   handleDelete(params: any) {
     const { uList } = this.state;
     const updatedList = [...uList];
@@ -210,6 +226,8 @@ class Home extends Component<HomeProps,User,State> {
       width: 150,
       renderCell: (params) => (
         <div>
+          <Button variant="outlined" color="primary" size="small" onClick={() => this.handleView(params)}>View</Button>
+          &nbsp;
           <Button variant="outlined" color="primary" size="small" onClick={() => this.handleEdit(params)}>Edit</Button>
           &nbsp;
           <Button variant="outlined" color="secondary" size="small" onClick={() => this.handleDelete(params)}>Delete</Button>
@@ -278,6 +296,11 @@ class Home extends Component<HomeProps,User,State> {
       Gender: user.gender,
       Password: user.password
     }));
+    const { navigateToOtherRoute, uid } = this.state;
+
+    if (navigateToOtherRoute) {
+      return <Navigate to={`/view/${uid}`} />;
+    }
     return (
       <center>
         <h3>Register</h3>
@@ -318,23 +341,21 @@ class Home extends Component<HomeProps,User,State> {
           />
           <br />
           <FormControl component="fieldset" error={!!errors.gender}>
-  <FormLabel component="legend">Gender</FormLabel>
-  <RadioGroup
-    aria-label="gender"
-    name="gender"
-    value={gender}
-    onChange={this.handleChange}
-  >
-    <FormControlLabel value="female" control={<Radio />} label="Female" />
-    <FormControlLabel value="male" control={<Radio />} label="Male" />
-    <FormControlLabel value="other" control={<Radio />} label="Other" />
-  </RadioGroup>
-  
-  {errors.gender && (
-    <FormHelperText>{errors.gender}</FormHelperText>
-    
-  )}
-</FormControl>
+            <FormLabel component="legend">Gender</FormLabel>
+            <RadioGroup
+            aria-label="gender"
+            name="gender"
+            value={gender}
+            onChange={this.handleChange}
+            >
+              <FormControlLabel value="female" control={<Radio />} label="Female" />
+              <FormControlLabel value="male" control={<Radio />} label="Male" />
+              <FormControlLabel value="other" control={<Radio />} label="Other" />
+            </RadioGroup>
+            {errors.gender && (
+            <FormHelperText>{errors.gender}</FormHelperText>
+            )}
+          </FormControl>
           <br />
           <FormControl variant="outlined">
   {/* <InputLabel htmlFor="component-outlined-password">Password</InputLabel> */}
