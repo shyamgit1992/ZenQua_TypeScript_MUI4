@@ -89,7 +89,7 @@ class Nav extends React.Component<NavProps, NavState> {
             </Typography>
           </div>
           <div className={classes.center}>
-          <RouterNavLink to="/home">  
+          <RouterNavLink to="/home" className={classes.link}>  
               <Button color="inherit">Home</Button>
             </RouterNavLink>
             <Button color="inherit">About</Button>
